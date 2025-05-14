@@ -85,47 +85,41 @@ class LocationDatabase:
 
         return total_distance
 
-    def location_search(self, name=None, location_type = None, address=None, latitude=None, longitude=None, state=None, zipcode=None ):
+    def location_search(self, name=None, city = None, address=None, state=None, zipcode=None ):
         """Given a name, address, latitude, OR longitude, it returns a list of tuples.
         The tuple list included the name, type, longitude, latitude, and address of the location.
         :param name: name of the location
-        :param location_type: type of location
+        :param city: name of city
         :param address: address of the location
-        :param latitude: latitude of the location
-        :param longitude: longitude of the location
         :param state: state of the location
         :param zipcode: zipcode of the location"""
 
-        if name is not None:
-            result = self.connection.sql(f"SELECT * FROM {self.database_name} WHERE Name = '{name}'")
-            # fetchall returns the info in a list of tuples
-            return result.fetchall()
+        modifier = ""
 
-        if location_type is not None:
-            result = self.connection.sql(f"SELECT * FROM {self.database_name} WHERE Type = '{location_type}'")
-            return result.fetchall()
+        if name is not None:
+            modifier += "WHERE " if modifier == "" else "AND "
+            modifier += f"Name = '{name}'"
+
+        if city is not None:
+            modifier += "WHERE " if modifier == "" else "AND "
+            modifier += f"City = '{city}'"
 
         if address is not None:
-            result = self.connection.sql(f"SELECT * FROM {self.database_name} WHERE Address = '{address}'")
-            return result.fetchall()
-
-        if latitude is not None:
-            result = self.connection.sql(f"SELECT * FROM {self.database_name} WHERE Latitude = '{latitude}'")
-            return result.fetchall()
-
-        if longitude is not None:
-            result = self.connection.sql(f"SELECT * FROM {self.database_name} WHERE Longitude = '{longitude}'")
-            return result.fetchall()
+            modifier += "WHERE " if modifier == "" else "AND "
+            modifier += f"Address = '{address}'"
 
         if state is not None:
-            result = self.connection.sql(f"SELECT * FROM {self.database_name} WHERE State = '{state}'")
-            return result.fetchall()
+            modifier += "WHERE " if modifier == "" else "AND "
+            modifier += f"State = '{state}'"
 
         if zipcode is not None:
-            result = self.connection.sql(f"SELECT * FROM {self.database_name} WHERE ZipCode = '{zipcode}'")
-            return result.fetchall()
+            modifier += "WHERE " if modifier == "" else "AND "
+            modifier += f"ZipCode = '{zipcode}'"
 
-        return None
+        result = self.connection.sql(f"SELECT * FROM {self.database_name} {modifier}")
+
+        # fetchall returns the info in a list of tuples
+        return result.fetchall()
 
     def __start_museums_aquarium_zoo_dataframe(self):
         """an initializer for the zoo_dataframe"""
