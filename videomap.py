@@ -4,7 +4,7 @@ from database.database import LocationDatabase #local database
 
 """
 database return structure:
-[("Name", "LocationType", "Latitude", "Longitude", "Address", "City", "State", "Country", "ZipCode"),]
+[("Name", "LocationType", "Latitude", "Longitude", "Address", "City", "State", "Country", "ZipCode", "Location_ID", ),]
 """
 
 def new_map(longitude, latitude):
@@ -37,7 +37,7 @@ def new_map(longitude, latitude):
     # Add markers for each restaurant
     locations = []
     for location in nearby_locations:
-        text = f"{location[0]}:\n {location[4]}, {location[5]}, {location[6]}, {location[7]}, {location[8]} "
+        text = f"{location[0]}-{location[9]}:\n {location[4]}, {location[5]}, {location[6]}, {location[7]}, {location[8]} "
         folium.Marker(
             location=[location[2], location[3]],
             tooltip=location[1],

@@ -16,6 +16,9 @@ class LocationDatabase:
 
         #dataframe for all location types
         locations_df = pd.concat([museum, fast_food, hospital], ignore_index=True, sort=False)
+
+        locations_df["Location_ID"] = locations_df.index
+
         #print(locations_df)
 
         #referenced from DuckDB documentation and https://medium.com/@anshubantra/using-duckdb-in-python-a-comprehensive-guide-d14bc0b06546
@@ -85,7 +88,7 @@ class LocationDatabase:
 
         return total_distance
 
-    def location_search(self, name=None, city = None, address=None, state=None, zipcode=None ):
+    def location_search(self, name=None, location_type = None, city = None, address=None, state=None, zipcode=None ):
         """Given a name, address, latitude, OR longitude, it returns a list of tuples.
         The tuple list included the name, type, longitude, latitude, and address of the location.
         :param name: name of the location
@@ -97,26 +100,33 @@ class LocationDatabase:
         modifier = ""
 
         if name is not None:
-            modifier += "WHERE " if modifier == "" else "AND "
-            modifier += f"Name = '{name}'"
+            modifier += "WHERE " if modifier == "" else " AND "
+            modifier += f"Name ILIKE '%{name.lower()}%'"
+
+        if location_type is not None:
+            modifier += "WHERE " if modifier == "" else " AND "
+            modifier += f"LocationType = '{location_type.lower()}'"
 
         if city is not None:
-            modifier += "WHERE " if modifier == "" else "AND "
-            modifier += f"City = '{city}'"
+            modifier += "WHERE " if modifier == "" else " AND "
+            modifier += f"City ILIKE '%{city.lower()}%'"
 
         if address is not None:
-            modifier += "WHERE " if modifier == "" else "AND "
-            modifier += f"Address = '{address}'"
+            modifier += "WHERE " if modifier == "" else " AND "
+            modifier += f"Address ILIKE '{address.lower()}'"
 
         if state is not None:
-            modifier += "WHERE " if modifier == "" else "AND "
-            modifier += f"State = '{state}'"
+            modifier += "WHERE " if modifier == "" else " AND "
+            modifier += f"State ILIKE '{state.lower()}'"
 
         if zipcode is not None:
-            modifier += "WHERE " if modifier == "" else "AND "
-            modifier += f"ZipCode = '{zipcode}'"
+            modifier += "WHERE " if modifier == "" else " AND "
+            modifier += f"ZipCode ILIKE '{zipcode}'"
 
-        result = self.connection.sql(f"SELECT * FROM {self.database_name} {modifier}")
+        sql_query = f"SELECT * FROM {self.database_name} {modifier}"
+        print(sql_query)
+
+        result = self.connection.sql(sql_query)
 
         # fetchall returns the info in a list of tuples
         return result.fetchall()
@@ -208,19 +218,18 @@ class LocationDatabase:
 def main():
     location_db = LocationDatabase()
 
-    sonic_drive_in = location_db.location_search(name = "SONIC Drive In")
-    print (f"Sonic Info: {sonic_drive_in.__sizeof__()}")
+    sonic_drive_in = location_db.location_search(name="Sonic", state="ca")
+    print (f"Sonic Info: {len(sonic_drive_in)}")
     print (sonic_drive_in)
 
-    california_locations = location_db.location_search(state = "CA")
-    print (f"California Info: {california_locations.__sizeof__()}")
 
-    test = location_db.location_search(longitude=-121.83653)
-    print (test, end="\n\n")
+    #california_locations = location_db.location_search(state = "CA")
+    #print (f"California Info: {california_locations.__sizeof__()}")
 
-    for i in range(10):
-        print (california_locations[i])
+    #for i in range(10):
+        #print (california_locations[i])
 
+    """
     nearby_local = location_db.nearby_locations(longitude1=-121.83653,
                                                 latitude1=39.7254,
                                                 distance_range=10000000,
@@ -228,6 +237,7 @@ def main():
                                                 )
 
     print (nearby_local)
+    """
 
 
 if __name__ == "__main__":
