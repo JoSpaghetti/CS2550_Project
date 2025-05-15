@@ -57,6 +57,13 @@ def gui():
         finally:
             interface.quit()
 
+    def use_current_coordinates():
+        #insert current location here
+        latitude = 0.0
+        longitude = 0.0
+
+        map.nearby_location_map(latitude, longitude, 100, "mi")
+
     nearby_tab = ttk.Frame(tab_control)
     tab_control.add(nearby_tab, text='Nearby Services')
 
@@ -82,6 +89,9 @@ def gui():
 
     find_b = tk.Button(nearby_tab, text="Find Nearby", command=find_locations)
     find_b.grid(row=5, column=0, columnspan=4, pady=10)
+
+    curr_coord_b = tk.Button(nearby_tab, text="Current Coordinates", command=use_current_coordinates)
+    curr_coord_b.grid(row=5, column=2, columnspan=4, pady=10)
 
     # --- Search Tab ---
     def search_location():

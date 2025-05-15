@@ -57,8 +57,8 @@ def distance_map(location1, location2):
 
     folium.plugins.AntPath(
         locations=coord_points,
-        tooltip=f"{dist_between:.2f} km",
-        popup=f"Total Distance: {dist_between:.2f} km",
+        tooltip=f"Total Distance: {dist_between:.2f} km",
+        popup=f"Total Walk Time: {dist_between * 9:.2f} minutes",
         reverse=True,
         dath_array=[20,30]
     ).add_to(gps_map)
