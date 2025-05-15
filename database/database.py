@@ -88,14 +88,16 @@ class LocationDatabase:
 
         return total_distance
 
-    def location_search(self, name=None, location_type = None, city = None, address=None, state=None, zipcode=None ):
+    def location_search(self, name=None, location_type = None, city = None, address=None, state=None, zipcode=None, location_id=None ):
         """Given a name, address, latitude, OR longitude, it returns a list of tuples.
         The tuple list included the name, type, longitude, latitude, and address of the location.
         :param name: name of the location
+        :param location_type: type of location
         :param city: name of city
         :param address: address of the location
         :param state: state of the location
-        :param zipcode: zipcode of the location"""
+        :param zipcode: zipcode of the location
+        :param location_id: id of the location"""
 
         modifier = ""
 
@@ -121,10 +123,14 @@ class LocationDatabase:
 
         if zipcode is not None:
             modifier += "WHERE " if modifier == "" else " AND "
-            modifier += f"ZipCode ILIKE '{zipcode}'"
+            modifier += f"ZipCode = '{zipcode}'"
+
+        if location_id is not None:
+            modifier += "WHERE " if modifier == "" else " AND "
+            modifier += f"Location_ID = '{location_id}'"
 
         sql_query = f"SELECT * FROM {self.database_name} {modifier}"
-        print(sql_query)
+        #print(sql_query)
 
         result = self.connection.sql(sql_query)
 
@@ -160,7 +166,6 @@ class LocationDatabase:
 
         return museum
 
-
     def __us_hospital_locations_dataframe(self):
         path = f"{self.folder}us_hospital_locations.csv"
 
@@ -185,7 +190,6 @@ class LocationDatabase:
             ["Name", "LocationType", "Latitude", "Longitude", "Address", "City", "State", "Country", "ZipCode"]]
 
         return hospital
-
 
     def __fast_food_restaurant_dataframe(self):
         path = f"{self.folder}Fast_Food_Restaurants_US.csv"
